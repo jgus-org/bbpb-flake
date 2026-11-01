@@ -14,25 +14,32 @@
       nixpkgs,
     }:
     flake-lib.lib.mkPythonFlake {
-      inherit
-        nixpkgs
-        self
-        ;
-      package = {
-        attr = "bbpb";
-        buildSystem = p: [ p.poetry-core ];
-        dependencies = p: [ p.six ];
-        description = "Library for working with protobuf messages without a protobuf type definition.";
-        extra.pythonImportsCheck = [ "blackboxprotobuf" ];
-        meta = {
-          homepage = "https://github.com/nccgroup/blackboxprotobuf";
-          license = nixpkgs.lib.licenses.mit;
-          mainProgram = "bbpb";
+      inherit nixpkgs self;
+      payload.packages =
+        {
+          buildPackage,
+          pkgs,
+          python,
+          ...
+        }:
+        {
+          bbpb = buildPackage {
+            build-system = [ python.poetry-core ];
+            dependencies = [ python.six ];
+            meta = {
+              description = "Library for working with protobuf messages without a protobuf type definition.";
+              homepage = "https://github.com/nccgroup/blackboxprotobuf";
+              license = pkgs.lib.licenses.mit;
+              mainProgram = "bbpb";
+            };
+            pname = "bbpb";
+            pyproject = true;
+            pythonImportsCheck = [ "blackboxprotobuf" ];
+          };
         };
-      };
-      pin = import ./pin.nix;
-      source = {
+      upstream = {
         format = "sdist";
+        pin = import ./pin.nix;
         pname = "bbpb";
         type = "pypi";
       };
